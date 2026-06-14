@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "module": "CommonJS",
+    "target": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": false
+  }
+}

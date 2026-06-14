@@ -1,0 +1,269 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserType {
+  REAL
+  BOT
+}
+
+enum SessionStatus {
+  PENDING
+  ACTIVE
+  COMPLETED
+}
+
+enum SubSessionStatus {
+  WAITING
+  ACTIVE
+  FINISHED
+}
+
+enum PlayerStatus {
+  ALIVE
+  ELIMINATED
+}
+
+enum ActionType {
+  ADVANCE
+  STEAL
+  SHIELD
+  REVIVE
+  TOKEN
+}
+
+enum LedgerType {
+  GAME_WIN
+  ITEM_PURCHASE
+  STEAL
+  REVENUE
+  SQUAD_DISTRIBUTION
+  ENTRY_FEE
+}
+
+model User {
+  id                String              @id @default(uuid())
+  username          String              @unique
+  email             String?             @unique
+  type              UserType            @default(REAL)
+  balance           Decimal             @default(0) @db.Decimal(18, 8)
+  squadId           String?
+  squad             Squad?              @relation(fields: [squadId], references: [id])
+  inventory         UserInventory[]
+  skills            UserSkill[]
+  badges            UserBadge[]
+  subSessionPlayers SubSessionPlayer[]
+  sessionRegistrations SessionRegistration[]
+  tokenLedger       TokenLedger[]
+  campEarnings      CampEarning[]
+  ownedCamps        Camp[]              @relation("CampOwner")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([type])
+}
+
+model Squad {
+  id                String              @id @default(uuid())
+  name              String              @unique
+  leaderId          String
+  members           User[]
+  tokenLedger       SquadTokenLedger[]
+  subSessionPlayers SubSessionPlayer[]
+  sessionRegistrations SessionRegistration[]
+  createdAt         DateTime            @default(now())
+}
+
+model Camp {
+  id           String        @id @default(uuid())
+  name         String
+  ownerId      String?
+  owner        User?         @relation("CampOwner", fields: [ownerId], references: [id])
+  location     String
+  revenueRate  Decimal       @db.Decimal(5, 2) // Percentage or multiplier
+  earnings     CampEarning[]
+  createdAt    DateTime      @default(now())
+}
+
+model Session {
+  id            String        @id @default(uuid())
+  name          String
+  status        SessionStatus @default(PENDING)
+  startTime     DateTime
+  endTime       DateTime?
+  prizePool     Decimal       @default(0) @db.Decimal(18, 8)
+  rulesId       String
+  rules         SessionRule   @relation(fields: [rulesId], references: [id])
+  subSessions   SubSession[]
+  registrations SessionRegistration[]
+  createdAt     DateTime      @default(now())
+}
+
+model SessionRegistration {
+  id        String   @id @default(uuid())
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  squadId   String?
+  squad     Squad?   @relation(fields: [squadId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([sessionId, userId])
+}
+
+model SubSession {
+  id          String           @id @default(uuid())
+  sessionId   String
+  session     Session          @relation(fields: [sessionId], references: [id])
+  capacity    Int              @default(100)
+  status      SubSessionStatus @default(WAITING)
+  players     SubSessionPlayer[]
+  spins       Spin[]
+  createdAt   DateTime         @default(now())
+}
+
+model SubSessionPlayer {
+  id           String         @id @default(uuid())
+  subSessionId String
+  subSession   SubSession     @relation(fields: [subSessionId], references: [id])
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  squadId      String?
+  squad        Squad?         @relation(fields: [squadId], references: [id])
+  status       PlayerStatus   @default(ALIVE)
+  tokens       Int            @default(0)
+  progress     Int            @default(0)
+  lastSpinId   String?
+  createdAt    DateTime       @default(now())
+
+  @@unique([subSessionId, userId])
+}
+
+model Spin {
+  id           String     @id @default(uuid())
+  subSessionId String
+  subSession   SubSession @relation(fields: [subSessionId], references: [id])
+  playerId     String
+  actionType   ActionType
+  result       Json       // Details of the spin result
+  timestamp    DateTime   @default(now())
+}
+
+model TokenLedger {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id])
+  amount      Decimal    @db.Decimal(18, 8)
+  type        LedgerType
+  referenceId String?    // Reference to Session, Spin, or CampEarning
+  timestamp   DateTime   @default(now())
+
+  @@index([userId])
+}
+
+model SquadTokenLedger {
+  id          String     @id @default(uuid())
+  squadId     String
+  squad       Squad      @relation(fields: [squadId], references: [id])
+  amount      Decimal    @db.Decimal(18, 8)
+  type        LedgerType
+  referenceId String?
+  timestamp   DateTime   @default(now())
+
+  @@index([squadId])
+}
+
+model ShopItem {
+  id          String          @id @default(uuid())
+  name        String
+  type        String          // e.g., SHIELD, CLOAK, INSURANCE, REVIVE
+  price       Decimal         @db.Decimal(18, 8)
+  description String?
+  inventory   UserInventory[]
+}
+
+model UserInventory {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  itemId    String
+  item      ShopItem @relation(fields: [itemId], references: [id])
+  quantity  Int      @default(0)
+
+  @@unique([userId, itemId])
+}
+
+model UserSkill {
+  id        String @id @default(uuid())
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  skillName String
+  level     Int    @default(1)
+
+  @@unique([userId, skillName])
+}
+
+model Badge {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String?
+  image       String?
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+model CampEarning {
+  id        String   @id @default(uuid())
+  campId    String
+  camp      Camp     @relation(fields: [campId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Decimal  @db.Decimal(18, 8)
+  sessionId String?
+  timestamp DateTime @default(now())
+}
+
+model AdminSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+}
+
+model SessionRule {
+  id                    String    @id @default(uuid())
+  name                  String
+  entryFee              Decimal   @default(0) @db.Decimal(18, 8)
+  showdownDuration      Int       @default(90) // seconds
+  eliminationPhaseRules Json      // Config for phases and targets
+  capacityPerSubSession Int       @default(100)
+  botRatio              Decimal   @db.Decimal(3, 2)
+  sessions              Session[]
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   // INFO, WARN, ERROR
+  message   String
+  metadata  Json?
+  timestamp DateTime @default(now())
+}

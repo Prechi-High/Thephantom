@@ -1,0 +1,383 @@
+THE PHANTOM V5 — MVP1 EXECUTION SPECIFICATION
+
+This document should answer every single question an engineer, AI, designer, tester, or future version of us could ask.
+
+For example:
+
+Session Formation
+Rule
+
+Maximum SubSession Capacity
+
+110
+
+Target Capacity
+
+100
+
+Example
+
+Global Session
+
+1,057 players
+
+System calculates:
+
+1057 / 100
+
+=
+
+10 full SubSessions
+
+1 overflow SubSession
+
+Result:
+
+SubSession 1 = 100
+
+SubSession 2 = 100
+
+...
+
+SubSession 10 = 100
+
+SubSession 11 = 57
+
+Squad Integrity
+
+Squads never split.
+
+Example:
+
+Squad Alpha
+
+5 members
+
+Remaining space in SubSession A
+
+3 slots
+
+Result:
+
+Entire squad moved to SubSession B
+
+Never split.
+
+Phase 1
+Duration
+
+6 Minutes
+
+Target
+
+60 Tokens
+
+Outcome Rules
+
+Player Tokens ≥ 60
+
+Result:
+
+Advance
+
+Player Tokens 40–59
+
+Result:
+
+Reserve Eligible
+
+Player Tokens 0–39
+
+Result:
+
+Eliminated Permanently
+
+Example
+Player	Tokens	Result
+A	75	Advance
+B	55	Reserve
+C	38	Eliminated
+Revival
+Cost
+
+3 Squad Tokens
+
+Example
+
+Player B
+
+55 Tokens
+
+Reserve Eligible
+
+Squad Pool
+
+10 Tokens
+
+Revive Cost
+
+3
+
+Result:
+
+Player revived
+
+Pool becomes
+
+7
+
+Phase 2
+
+Bottom 60%
+
+Removed
+
+Example
+
+50 Survivors
+
+Calculation:
+
+50 × 60%
+
+=
+
+30 Eliminated
+
+20 Advance
+
+Ranking Example
+Rank
+1
+2
+3
+...
+20
+
+Advance
+
+Ranks 21–50
+
+Eliminated
+
+Phase 3
+
+Bottom 70%
+
+Removed
+
+Example
+
+20 Players
+
+20 × 70%
+
+=
+
+14 Eliminated
+
+6 Advance
+
+Championship
+
+No elimination.
+
+No revive.
+
+No target.
+
+Only ranking.
+
+Timer ends.
+
+Tokens freeze.
+
+Ranking calculated.
+
+Top 15% Calculation
+
+This is where most AI systems fail.
+
+Example:
+
+100 Players
+
+Top 15%
+
+=
+
+15 Players
+
+Ranks
+
+1–15
+
+Enter Reward Tier
+
+Ranks
+
+16–100
+
+Receive Nothing
+
+Refund Layer
+
+Inside Top 15
+
+Bottom 10
+
+Receive Refund
+
+Example
+
+Top 15
+
+Rank 1–15
+
+Bottom 10
+
+=
+
+Ranks 6–15
+
+Refund
+
+$5 Entry
+
+Each receives
+
+$5
+
+Calculation
+
+10 × $5
+
+=
+
+$50
+
+Removed from reward pool first.
+
+Top Performer Layer
+
+Remaining Reward Pool
+
+60%
+
+Allocated
+
+Eligible
+
+Ranks 1–5
+
+Only
+
+Formula
+
+Player Tokens
+
+÷
+
+Total Tokens of Top 5
+
+×
+
+Top Performer Pool
+
+Example
+
+Top Performer Pool
+
+$120
+
+Tokens
+
+Rank 1 = 200
+
+Rank 2 = 150
+
+Rank 3 = 100
+
+Rank 4 = 50
+
+Rank 5 = 50
+
+Total
+
+550
+
+Rank 1
+
+200 ÷ 550 × 120
+
+=
+
+$43.64
+
+And so on.
+
+Squad Pool Layer
+
+Remaining Reward Pool
+
+40%
+
+Allocated
+
+Only Winner's Squad
+
+Eligible
+
+Formula
+
+Member Tokens
+
+÷
+
+Total Squad Tokens
+
+×
+
+Squad Pool
+
+Example
+
+Squad Pool
+
+$80
+
+Winner Squad
+
+Player A = 50
+
+Player B = 30
+
+Player C = 20
+
+Total
+
+100
+
+Player A
+
+50%
+
+=
+
+$40
+
+Player B
+
+30%
+
+=
+
+$24
+
+Player C
+
+20%
+
+=
+
+$16
