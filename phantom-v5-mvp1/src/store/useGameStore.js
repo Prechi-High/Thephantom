@@ -85,8 +85,8 @@ export const useGameStore = create((set, get) => ({
 
   // SPIN MECHANIC
   spin: (playerId) => {
-    const state = get();
-    const player = state.players.find(p => p.id === playerId);
+    const store = get();
+    const player = store.players.find(p => p.id === playerId);
     if (!player || player.status === 'ELIMINATED') return;
 
     const roll = Math.random();
@@ -99,20 +99,20 @@ export const useGameStore = create((set, get) => ({
     else if (roll < 0.82) result = { type: 'CLOAK', value: 0, label: 'CLOAK ON' };
     else if (roll < 0.95) result = { type: 'STEAL', value: 0, label: 'STEAL ATTEMPT' };
 
-    set(state => {
-      const newPlayers = state.players.map(p => ({ ...p }));
+    set(oldState => {
+      const newPlayers = oldState.players.map(p => ({ ...p }));
       const pIdx = newPlayers.findIndex(p => p.id === playerId);
       const currentPlayer = newPlayers[pIdx];
 
       if (result.type === 'TOKEN' || result.type === 'ADVANCE') {
         currentPlayer.tokens += result.value;
-        state.addEvent(`${currentPlayer.username} gained ${result.value} tokens!`, 'TOKEN');
+        store.addEvent(`${currentPlayer.username} gained ${result.value} tokens!`, 'TOKEN');
       } else if (result.type === 'SHIELD') {
         currentPlayer.shieldActive = true;
-        state.addEvent(`${currentPlayer.username} activated SHIELD!`, 'SHIELD');
+        store.addEvent(`${currentPlayer.username} activated SHIELD!`, 'SHIELD');
       } else if (result.type === 'CLOAK') {
         currentPlayer.cloakActive = true;
-        state.addEvent(`${currentPlayer.username} is now CLOAKED!`, 'CLOAK');
+        store.addEvent(`${currentPlayer.username} is now CLOAKED!`, 'CLOAK');
         setTimeout(() => {
           set(s => ({ players: s.players.map(p => p.id === playerId ? { ...p, cloakActive: false } : p) }));
         }, 15000);
@@ -125,21 +125,21 @@ export const useGameStore = create((set, get) => ({
         if (victim) {
           if (victim.shieldActive) {
             victim.shieldActive = false;
-            state.addEvent(`${currentPlayer.username}'s steal blocked by ${victim.username}'s SHIELD!`, 'SHIELD');
+            store.addEvent(`${currentPlayer.username}'s steal blocked by ${victim.username}'s SHIELD!`, 'SHIELD');
           } else {
             const amount = Math.min(victim.tokens, 1.5);
             victim.tokens -= amount;
             currentPlayer.tokens += amount;
-            state.addEvent(`${currentPlayer.username} stole ${amount.toFixed(1)} from ${victim.username}!`, 'STEAL');
+            store.addEvent(`${currentPlayer.username} stole ${amount.toFixed(1)} from ${victim.username}!`, 'STEAL');
           }
         } else {
-          state.addEvent(`${currentPlayer.username} failed to find a valid steal target.`, 'SYSTEM');
+          store.addEvent(`${currentPlayer.username} failed to find a valid steal target.`, 'SYSTEM');
         }
       }
 
       return { 
         players: newPlayers,
-        lastSpinResult: currentPlayer.isReal ? result : state.lastSpinResult 
+        lastSpinResult: currentPlayer.isReal ? result : oldState.lastSpinResult 
       };
     });
   },
