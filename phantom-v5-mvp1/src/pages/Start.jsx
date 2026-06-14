@@ -1,73 +1,55 @@
 import React from 'react';
 import { useGameStore } from '../store/useGameStore';
 import { motion } from 'framer-motion';
-import { LayoutGrid, Zap } from 'lucide-react';
+import { Users, Wallet, ChevronRight, Zap } from 'lucide-react';
 
 const Start = () => {
-  const { players, setView } = useGameStore();
-  const user = players.find(p => p.isReal) || {};
+  const { setView, players, userPlayerId } = useGameStore();
+  const user = players.find(p => p.id === userPlayerId) || {};
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-10 max-w-6xl mx-auto space-y-12 bg-cyber-bg h-screen"
-    >
-      <div className="flex justify-between items-end border-b border-zinc-900 pb-8">
-        <div>
-          <h2 className="text-sm font-black text-zinc-600 uppercase tracking-widest">Operator Authorization</h2>
-          <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase">{user.username}</h1>
-        </div>
-        <div className="text-right">
-          <div className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Subsection ID</div>
-          <div className="text-4xl font-black text-cyber-purple italic">SUB-001</div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-cyber-card border border-zinc-800 p-8 rounded-3xl space-y-6">
-          <div className="flex items-center gap-4 text-zinc-400">
-             <LayoutGrid size={20} className="text-cyber-cyan" />
-             <span className="font-black uppercase tracking-widest text-xs">Loadout Data</span>
+    <div className="min-h-screen bg-cyber-bg p-10 flex items-center justify-center">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-4xl bg-cyber-card border border-zinc-800 rounded-[40px] p-12 space-y-12"
+      >
+        <div className="flex justify-between items-center border-b border-zinc-800 pb-8">
+          <div className="space-y-2">
+            <h2 className="text-sm font-black text-cyber-cyan uppercase tracking-[0.3em]">Operator Authorized</h2>
+            <h1 className="text-5xl font-black italic uppercase tracking-tighter text-white">{user.username}</h1>
           </div>
-          <div className="space-y-4 text-sm font-bold uppercase tracking-tight">
-             <div className="flex justify-between border-b border-zinc-800 pb-2">
-                <span className="text-zinc-500">Starting Tokens</span>
-                <span className="text-white">0.00</span>
-             </div>
-             <div className="flex justify-between border-b border-zinc-800 pb-2">
-                <span className="text-zinc-500">Assigned Squad</span>
-                <span className="text-cyber-cyan">Alpha-5</span>
-             </div>
-             <div className="flex justify-between border-b border-zinc-800 pb-2">
-                <span className="text-zinc-500">Entry Fee</span>
-                <span className="text-cyber-gold">$5.00</span>
-             </div>
+          <div className="text-right">
+            <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Clearance Level</div>
+            <div className="text-3xl font-black text-cyber-purple italic">V5-ALPHA</div>
           </div>
         </div>
 
-        <div className="md:col-span-2 bg-cyber-card border border-zinc-800 p-8 rounded-3xl relative overflow-hidden flex flex-col justify-center space-y-6">
-           <h3 className="text-2xl font-black italic uppercase text-cyber-gold">Mission Parameters</h3>
-           <p className="text-xs text-zinc-500 leading-relaxed max-w-lg uppercase font-bold">
-              Deployment to Phase 1 requires 6 minutes of sustained token generation. 
-              Target threshold locked at 38 tokens. Survival is binary. 
-              Manual squad revival permitted within 40-59 token range only.
-           </p>
-           <Zap size={120} className="absolute -right-4 -bottom-4 text-zinc-800 rotate-12 opacity-30" />
+        <div className="grid grid-cols-2 gap-8">
+          <div className="bg-zinc-950/50 p-8 rounded-3xl border border-zinc-800 space-y-4">
+            <div className="flex items-center gap-3 text-zinc-500 font-black uppercase text-[10px] tracking-widest">
+              <Users size={16} className="text-cyber-cyan" /> Identity Data
+            </div>
+            <div className="text-2xl font-black italic text-white tracking-tight">{user.username}</div>
+          </div>
+          <div className="bg-zinc-950/50 p-8 rounded-3xl border border-zinc-800 space-y-4">
+            <div className="flex items-center gap-3 text-zinc-500 font-black uppercase text-[10px] tracking-widest">
+              <Wallet size={16} className="text-cyber-gold" /> Current Balance
+            </div>
+            <div className="text-2xl font-black italic text-cyber-gold tracking-tight">{user.tokens?.toFixed(1)} <span className="text-sm">PHNTM</span></div>
+          </div>
         </div>
-      </div>
 
-      <div className="flex justify-center pt-8">
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <motion.button
+          whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(0, 229, 255, 0.3)" }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => setView('LOBBY')}
-          className="px-20 py-6 bg-white text-black font-black text-2xl rounded-2xl hover:bg-cyber-cyan transition-all shadow-neon-cyan"
+          className="w-full py-8 bg-transparent border-2 border-white text-white font-black text-2xl uppercase rounded-2xl flex items-center justify-center gap-4 transition-all hover:bg-white hover:text-black"
         >
-          JOIN SESSION
+          DEPLOY TO LOBBY <ChevronRight size={28} />
         </motion.button>
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
