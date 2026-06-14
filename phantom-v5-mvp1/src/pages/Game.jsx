@@ -56,7 +56,7 @@ const Game = () => {
   };
 
   return (
-    <div className="h-screen bg-cyber-bg grid grid-cols-12 gap-6 p-6 overflow-hidden text-white font-sans">
+    <div className="h-screen bg-red-900 grid grid-cols-12 gap-6 p-6 overflow-hidden text-white font-sans">
       {/* LEFT PANEL */}
       <div className="col-span-3 flex flex-col gap-6">
         <div className="bg-cyber-card border border-zinc-800 p-6 rounded-3xl space-y-4">
