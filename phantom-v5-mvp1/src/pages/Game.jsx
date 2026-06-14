@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGameStore } from '../store/useGameStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -12,25 +12,23 @@ import {
 } from 'lucide-react';
 
 const Game = () => {
-  const { 
-    players, 
-    timer, 
-    phase, 
-    spin, 
-    eventLog, 
-    userPlayerId, 
-    lastSpinResult,
-    isAccelerated,
-    toggleAcceleration,
-    reviveTeammate
-  } = useGameStore();
+  const players = useGameStore(state => state.players);
+  const timer = useGameStore(state => state.timer);
+  const phase = useGameStore(state => state.phase);
+  const spin = useGameStore(state => state.spin);
+  const eventLog = useGameStore(state => state.eventLog);
+  const userPlayerId = useGameStore(state => state.userPlayerId);
+  const lastSpinResult = useGameStore(state => state.lastSpinResult);
+  const isAccelerated = useGameStore(state => state.isAccelerated);
+  const toggleAcceleration = useGameStore(state => state.toggleAcceleration);
+  const reviveTeammate = useGameStore(state => state.reviveTeammate);
 
-  const user = players.find(p => p.id === userPlayerId);
-  const userSquad = players.filter(p => p.squadId === user?.squadId);
-  const leaderboard = [...players]
+  const user = useMemo(() => players.find(p => p.id === userPlayerId), [players, userPlayerId]);
+  const userSquad = useMemo(() => players.filter(p => p.squadId === user?.squadId), [players, user?.squadId]);
+  const leaderboard = useMemo(() => [...players]
     .filter(p => p.status !== 'ELIMINATED')
     .sort((a, b) => b.tokens - a.tokens)
-    .slice(0, 10);
+    .slice(0, 10), [players]);
 
   const [isSpinning, setIsSpinning] = useState(false);
 
