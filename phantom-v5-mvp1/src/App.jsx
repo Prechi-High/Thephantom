@@ -7,6 +7,7 @@ import Lobby from './pages/Lobby';
 import Game from './pages/Game';
 import Transition from './pages/Transition';
 import Results from './pages/Results';
+import BottomNavigation from './components/layout/BottomNavigation';
 
 function App() {
   const { view, tick } = useGameStore();
@@ -35,6 +36,7 @@ function App() {
         {view === 'TRANSITION' && <Transition key="transition" />}
         {view === 'RESULTS' && <Results key="results" />}
       </AnimatePresence>
+      <BottomNavigation />
     </div>
   );
 }

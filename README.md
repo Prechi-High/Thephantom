@@ -1,42 +1,30 @@
-# THE PHANTOM - MVP
+# Thephantom Project
 
-Real-time multiplayer strategy + economy game.
+## Overview
+This project is designed to [insert project description here].
 
-## Tech Stack
-- **Frontend**: Next.js, Tailwind, Zustand, Framer Motion
-- **Backend**: Node.js, Express, Socket.IO, Redis, BullMQ
-- **Database**: PostgreSQL, Prisma ORM
+## Getting Started
+To get started with this project, clone the repository and install the necessary dependencies.
 
-## Prerequisites
-- Node.js v20.12.2+
-- PostgreSQL
-- Redis
+## Installation
+1. Clone the repository:
+   ```
+   git clone https://github.com/Prechi-High/Thephantom.git
+   ```
+2. Navigate to the project directory:
+   ```
+   cd Thephantom
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   ```
 
-## Setup & Run
+## Usage
+[Insert usage instructions here.]
 
-### 1. Database Setup
-```bash
-# Update .env with your credentials
-npx prisma db push
-npx ts-node seed.ts
-```
+## Contributing
+[Insert contribution guidelines here.]
 
-### 2. Backend
-```bash
-# In the root directory
-npm install
-npm run start # You may need to add this script to package.json
-```
-
-### 3. Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## System Architecture
-- **Session Engine**: Manages global game events and sub-session partitioning.
-- **Spin Engine**: Event-driven real-time gameplay loop via Socket.IO and Redis.
-- **Bot Engine**: Internal Node.js simulation of aggressive, defensive, and balanced archetypes.
-- **Economy Ledger**: Full traceability of all token transactions in PostgreSQL.
+## License
+[Insert license information here.]

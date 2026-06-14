@@ -1,20 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap, Activity, Users, Ghost, Target, ArrowUpRight } from 'lucide-react';
+import { Users } from 'lucide-react';
+import SpinPhase from './game/SpinPhase';
+import StealPhase from './game/StealPhase';
+import ResolutionPhase from './game/ResolutionPhase';
 
 const Game = () => {
   const players = useGameStore(state => state.players);
   const timer = useGameStore(state => state.timer);
   const phase = useGameStore(state => state.phase);
-  const spin = useGameStore(state => state.spin);
   const eventLog = useGameStore(state => state.eventLog);
   const userPlayerId = useGameStore(state => state.userPlayerId);
-  const lastSpinResult = useGameStore(state => state.lastSpinResult);
-  const isAccelerated = useGameStore(state => state.isAccelerated);
-  const toggleAcceleration = useGameStore(state => state.toggleAcceleration);
-  const reviveTeammate = useGameStore(state => state.reviveTeammate);
-  const spinCount = useGameStore(state => state.spinCount);
 
   const user = useMemo(() => players.find(p => p.id === userPlayerId), [players, userPlayerId]);
   const userSquad = useMemo(() => players.filter(p => p.squadId === user?.squadId), [players, user?.squadId]);
@@ -23,19 +19,10 @@ const Game = () => {
     .sort((a, b) => b.tokens - a.tokens)
     .slice(0, 10), [players]);
 
-  const [isSpinning, setIsSpinning] = useState(false);
-
   useEffect(() => {
     const interval = setInterval(() => useGameStore.getState().tick(), 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleSpin = () => {
-    if (isSpinning || user?.status === 'ELIMINATED') return;
-    setIsSpinning(true);
-    spin(userPlayerId);
-    setTimeout(() => setIsSpinning(false), 800);
-  };
 
   const formatTime = (s) => {
     const mins = Math.floor(s / 60);
@@ -43,8 +30,17 @@ const Game = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const renderPhase = () => {
+    switch (phase) {
+      case 'SPIN': return <SpinPhase />;
+      case 'STEAL': return <StealPhase />;
+      case 'RESOLUTION': return <ResolutionPhase />;
+      default: return <div className="flex-grow flex items-center justify-center bg-cyber-card rounded-[50px] border border-white/5 text-zinc-500 uppercase font-black">Phase {phase} Active</div>;
+    }
+  };
+
   return (
-    <div className="h-screen bg-cyber-bg grid grid-cols-12 gap-6 p-6 overflow-hidden text-white font-sans">
+    <div className="h-screen bg-cyber-bg grid grid-cols-12 gap-6 p-6 overflow-hidden text-white font-sans pb-24">
       {/* LEFT PANEL: Squad & Logs */}
       <div className="col-span-3 flex flex-col gap-6">
         <div className="bg-cyber-card p-6 rounded-3xl border border-white/5 space-y-4">
@@ -73,7 +69,7 @@ const Game = () => {
         </div>
       </div>
 
-      {/* CENTER: Spin Wheel */}
+      {/* CENTER: Dynamic Phase Area */}
       <div className="col-span-6 flex flex-col gap-6">
         <div className="flex justify-between items-center bg-cyber-card px-10 py-6 rounded-[40px] border border-white/5">
            <div className="flex gap-10">
@@ -88,23 +84,7 @@ const Game = () => {
            </div>
         </div>
 
-        <div className="flex-grow flex flex-col items-center justify-center bg-cyber-card rounded-[50px] border border-white/5 relative">
-           <motion.div 
-             animate={isSpinning ? { rotate: 360 * 5 } : { rotate: 0 }}
-             className="w-72 h-72 rounded-full border-4 border-cyber-cyan/30 flex items-center justify-center shadow-neon-purple"
-           >
-              <div className="text-6xl font-black italic text-white tabular-nums">{user?.tokens.toFixed(1)}</div>
-           </motion.div>
-
-           <motion.button
-             whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(0, 229, 255, 0.4)" }}
-             whileTap={{ scale: 0.95 }}
-             onClick={handleSpin}
-             className="mt-12 px-20 py-6 bg-cyber-cyan text-black font-black text-3xl italic rounded-2xl"
-           >
-             SPIN ({spinCount})
-           </motion.button>
-        </div>
+        {renderPhase()}
       </div>
 
       {/* RIGHT PANEL: Leaderboard */}
