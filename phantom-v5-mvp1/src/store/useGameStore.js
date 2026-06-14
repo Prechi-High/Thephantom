@@ -43,6 +43,7 @@ export const useGameStore = create((set, get) => ({
   })),
   userPlayerId: 'p0',
   lastSpinResult: null,
+  spinCount: 0, // Add debug counter
 
   // ACTIONS
   setView: (view) => set({ view }),
@@ -74,7 +75,7 @@ export const useGameStore = create((set, get) => ({
       squads, 
       phase: 1, 
       timer: PHASE_CONFIG[1].duration, 
-      isRunning: false, 
+      isRunning: true, // Fix: Ensure simulation starts running
       eventLog: [] 
     });
   },
@@ -139,7 +140,8 @@ export const useGameStore = create((set, get) => ({
 
       return { 
         players: newPlayers,
-        lastSpinResult: currentPlayer.isReal ? result : oldState.lastSpinResult 
+        lastSpinResult: currentPlayer.isReal ? result : oldState.lastSpinResult,
+        spinCount: oldState.spinCount + 1 // Increment spinCount
       };
     });
   },
